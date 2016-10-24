@@ -57,34 +57,29 @@ public class PlayerMovementController : MonoBehaviour {
     void Update()
     {
 
-        if (Mathf.Abs(totalXRotation) > 2.0f)
+        if (totalXRotation > 5.0f)
         {
-            if (totalXRotation > 0)
-            {
-                totalXRotation -= Time.deltaTime * PlayerRotationSpeed;
-                this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * Vector3.right);
-            }
-            else
-            {
-                totalXRotation += Time.deltaTime * PlayerRotationSpeed;
-                this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * -Vector3.right);
-            }
+            totalXRotation -= Time.deltaTime * PlayerRotationSpeed;
+            this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * Vector3.right);
+        }
+        else if (totalXRotation < -5.0f)
+        {
+            totalXRotation += Time.deltaTime * PlayerRotationSpeed;
+            this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * -Vector3.right);
         }
 
-        if (Mathf.Abs(totalZRotation) > 2.0f)
+        if (totalZRotation > 5.0f)
         {
-            if (totalZRotation > 0)
-            {
-                totalZRotation -= Time.deltaTime * PlayerRotationSpeed;
-                this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * -Vector3.forward);
-            }
-            else
-            {
-                totalZRotation += Time.deltaTime * PlayerRotationSpeed;
-                this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * Vector3.forward);
-            }
+            totalZRotation -= Time.deltaTime * PlayerRotationSpeed;
+            this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * -Vector3.forward);
         }
-        if (Mathf.Abs(totalZRotation) < 2.0f && Mathf.Abs(totalXRotation) < 2.0f)
+        else if (totalZRotation < -5.0f)
+        {
+            totalZRotation += Time.deltaTime * PlayerRotationSpeed;
+            this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * Vector3.forward);
+        }
+
+        if (Mathf.Abs(totalZRotation) <= 5.0f && Mathf.Abs(totalXRotation) <= 5.0f)
         {
             this.transform.rotation = Quaternion.AngleAxis(0, Vector3.right + Vector3.forward);
             totalXRotation = 0.0f;
@@ -113,7 +108,7 @@ public class PlayerMovementController : MonoBehaviour {
                 this.transform.position = getJumpPosForward();
             }
 
-            if((this.transform.position - endPos).magnitude < 0.3f)
+            if((this.transform.position - endPos).magnitude < 0.4f)
             {
                 //Debug.Log("#############################################");
                 Jumping = false;
