@@ -2,20 +2,26 @@
 using System.Collections;
 using UnityEditor;
 
-[CustomEditor (typeof (MapGenerator))]
-public class MapGeneratorEditor : Editor {
-
+[CustomEditor (typeof (MapTerrainGenerator))]
+public class MapGeneratorEditor : Editor
+{
+    /*
 	public override void OnInspectorGUI() {
-		MapGenerator mapGen = (MapGenerator)target;
+        MapTerrainGenerator mapGen = (MapTerrainGenerator)target;
 
+        
 		if (DrawDefaultInspector ()) {
 			if (mapGen.autoUpdate) {
 				mapGen.instanciateCubes();
 			}
 		}
-
+        
 		if (GUILayout.Button ("Generate")) {
 			mapGen.instanciateCubes();
 		}
-	}
+        if (GUILayout.Button("Clear Map"))
+        {
+            mapGen.removeMap();
+        }
+    }*/
 }

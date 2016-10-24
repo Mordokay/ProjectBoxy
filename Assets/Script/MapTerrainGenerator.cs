@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MapGenerator : MonoBehaviour {
+public class MapTerrainGenerator : MonoBehaviour {
 
     public int sizeX = 20;
     public int sizeY = 20;
@@ -22,14 +22,12 @@ public class MapGenerator : MonoBehaviour {
     public int[ , ] mapHeight;
 
     public bool autoUpdate;
+    public bool makeColliders = false;
 
     public Vector2 mapCenter = Vector2.zero;
-    GameManager gm;
 
     void Start() {
-        gm = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
-        gm.terrainCount = terrain.Length;
-        instanciateCubes();
+        //instanciateCubes();
     }
 
     void CreateHeight()
@@ -48,7 +46,6 @@ public class MapGenerator : MonoBehaviour {
                     noiseMap[x, y] = 0.001f;
 
                 mapHeight[x, y] = (int)((noiseMap[x, y] * 10.0f) / ((1.0f / terrain.Length) * 10.0f));
-                //Debug.Log("just noise:  " + noiseMap[x, y] + "Noise: " + (noiseMap[x, y] * 10.0f) / ((1.0f / terrain.Length) * 10.0f) + "height:  " + mapHeight[x, y]);
             }
         }
     }
@@ -61,7 +58,6 @@ public class MapGenerator : MonoBehaviour {
         }
         if (this.transform.childCount > 0)
         {
-            //Debug.Log("RemovingAgain!!!!:  " + this.transform.childCount);
             removeMap();
         }
     }
@@ -78,9 +74,12 @@ public class MapGenerator : MonoBehaviour {
             {
                 if (x < 0 || x == sizeX || y < 0 || y == sizeY)
                 {
-                    GameObject myCubeLimit = Instantiate(cubeLimit) as GameObject;
-                    myCubeLimit.transform.position = new Vector3(x * cubeScale, 0.0f, y * cubeScale);
-                    myCubeLimit.transform.parent = this.transform;
+                    if (makeColliders)
+                    {
+                        GameObject myCubeLimit = Instantiate(cubeLimit) as GameObject;
+                        myCubeLimit.transform.position = new Vector3(x * cubeScale, 0.0f, y * cubeScale);
+                        myCubeLimit.transform.parent = this.transform;
+                    }
                 }
                 else
                 {
