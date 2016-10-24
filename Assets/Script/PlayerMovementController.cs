@@ -23,6 +23,12 @@ public class PlayerMovementController : MonoBehaviour {
     public float velocityY0;
     public float velocityZ0;
     public float jumpDurationTime = 0.0f;
+
+    public float totalXRotation = 0;
+    public float totalZRotation = 0;
+
+    public float PlayerRotationSpeed = 300.0f;
+
     public float startJumpTime;
     public Vector3 startPos;
     public Vector3 endPos;
@@ -50,6 +56,41 @@ public class PlayerMovementController : MonoBehaviour {
 
     void Update()
     {
+
+        if (Mathf.Abs(totalXRotation) > 2.0f)
+        {
+            if (totalXRotation > 0)
+            {
+                totalXRotation -= Time.deltaTime * PlayerRotationSpeed;
+                this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * Vector3.right);
+            }
+            else
+            {
+                totalXRotation += Time.deltaTime * PlayerRotationSpeed;
+                this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * -Vector3.right);
+            }
+        }
+
+        if (Mathf.Abs(totalZRotation) > 2.0f)
+        {
+            if (totalZRotation > 0)
+            {
+                totalZRotation -= Time.deltaTime * PlayerRotationSpeed;
+                this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * -Vector3.forward);
+            }
+            else
+            {
+                totalZRotation += Time.deltaTime * PlayerRotationSpeed;
+                this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * Vector3.forward);
+            }
+        }
+        if (Mathf.Abs(totalZRotation) < 2.0f && Mathf.Abs(totalXRotation) < 2.0f)
+        {
+            this.transform.rotation = Quaternion.AngleAxis(0, Vector3.right + Vector3.forward);
+            totalXRotation = 0.0f;
+            totalZRotation = 0.0f;
+        }
+
         if (Jumping)
         {
             //Debug.Log("velocityX0: " + velocityX0 + "velocityZ0: " + velocityZ0);
@@ -72,7 +113,7 @@ public class PlayerMovementController : MonoBehaviour {
                 this.transform.position = getJumpPosForward();
             }
 
-            if((this.transform.position - endPos).magnitude < 0.2f)
+            if((this.transform.position - endPos).magnitude < 0.3f)
             {
                 //Debug.Log("#############################################");
                 Jumping = false;
@@ -116,11 +157,13 @@ public class PlayerMovementController : MonoBehaviour {
                                 if (swipeValue > 0)
                                 {
                                     Move(MoveDir.Front);
+                                    totalXRotation += 90;
                                     //Debug.Log("Up Swipe");
                                 }
                                 else if (swipeValue < 0)
                                 {
                                     Move(MoveDir.Back);
+                                    totalXRotation -= 90;
                                     //Debug.Log("Down Swipe");
                                 }
                             }
@@ -133,11 +176,13 @@ public class PlayerMovementController : MonoBehaviour {
                                 if (swipeValue > 0)
                                 {
                                     Move(MoveDir.Right);
+                                    totalZRotation += 90.0f;
                                     //Debug.Log("Right Swipe");
                                 }
                                 else if (swipeValue < 0)
                                 {
                                     Move(MoveDir.Left);
+                                    totalZRotation -= 90.0f;
                                     //Debug.Log("left Swipe");
                                 }
                             }
@@ -233,6 +278,7 @@ public class PlayerMovementController : MonoBehaviour {
 
         switch (moveType)
         {
+            //The value 100 means that the cube can jump 100.0f down!!!
             case MoveDir.Front:
                 //Going up detection
                 if (Physics.Raycast(endPos, Vector3.forward, out hit, movementShift, boxLayer))
@@ -244,7 +290,7 @@ public class PlayerMovementController : MonoBehaviour {
                 }
                 //Going Down detection
                 else if (!Physics.Raycast(endPos + Vector3.forward * movementShift, Vector3.down, out hit, cubeHeight / 1.5f, boxLayer) &&
-                    Physics.Raycast(endPos + Vector3.forward * movementShift, Vector3.down, out hit, cubeHeight * 6.0f, boxLayer))
+                    Physics.Raycast(endPos + Vector3.forward * movementShift, Vector3.down, out hit, cubeHeight * 100.0f, boxLayer))
                 {
                     //print("Found an object Down - distance: " + hit.distance + " Called: " + hit.collider.gameObject.name);
                     //this.transform.Translate(Vector3.down * cubeHeight);
@@ -265,7 +311,7 @@ public class PlayerMovementController : MonoBehaviour {
                 }
                 //Going Down detection
                 else if (!Physics.Raycast(endPos - Vector3.forward * movementShift, Vector3.down, out hit, cubeHeight / 1.5f, boxLayer) &&
-                    Physics.Raycast(endPos - Vector3.forward * movementShift, Vector3.down, out hit, cubeHeight * 6.0f, boxLayer))
+                    Physics.Raycast(endPos - Vector3.forward * movementShift, Vector3.down, out hit, cubeHeight * 100.0f, boxLayer))
                 {
                     //print("Found an object Down - distance: " + hit.distance + " Called: " + hit.collider.gameObject.name);
                     //this.transform.Translate(Vector3.down * cubeHeight);
@@ -286,7 +332,7 @@ public class PlayerMovementController : MonoBehaviour {
                 }
                 //Going Down detection
                 else if (!Physics.Raycast(endPos - Vector3.right * movementShift, Vector3.down, out hit, cubeHeight / 1.5f, boxLayer) &&
-                    Physics.Raycast(endPos - Vector3.right * movementShift, Vector3.down, out hit, cubeHeight * 6.0f, boxLayer))
+                    Physics.Raycast(endPos - Vector3.right * movementShift, Vector3.down, out hit, cubeHeight * 100.0f, boxLayer))
                 {
                     //print("Found an object Down - distance: " + hit.distance + " Called: " + hit.collider.gameObject.name);
                     //this.transform.Translate(Vector3.down * cubeHeight);
@@ -307,7 +353,7 @@ public class PlayerMovementController : MonoBehaviour {
                 }
                 //Going Down detection
                 else if (!Physics.Raycast(endPos + Vector3.right * movementShift, Vector3.down, out hit, cubeHeight / 1.5f, boxLayer) &&
-                    Physics.Raycast(endPos + Vector3.right * movementShift, Vector3.down, out hit, cubeHeight * 6.0f, boxLayer))
+                    Physics.Raycast(endPos + Vector3.right * movementShift, Vector3.down, out hit, cubeHeight * 100.0f, boxLayer))
                 {
                     //print("Found an object Down - distance: " + hit.distance + " Called: " + hit.collider.gameObject.name);
                     //this.transform.Translate(Vector3.down * cubeHeight);
