@@ -56,36 +56,16 @@ public class PlayerMovementController : MonoBehaviour {
 
     void Update()
     {
+        this.transform.rotation = Quaternion.Slerp(this.transform.rotation, Quaternion.Euler(totalXRotation, 0.0f, totalZRotation), Time.deltaTime * 10.0f);
+        float angle = Quaternion.Angle(this.transform.rotation, Quaternion.Euler(totalXRotation, 0.0f, totalZRotation));
 
-        if (totalXRotation > 5.0f)
+        if (angle < 1.0f)
         {
-            totalXRotation -= Time.deltaTime * PlayerRotationSpeed;
-            this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * Vector3.right);
-        }
-        else if (totalXRotation < -5.0f)
-        {
-            totalXRotation += Time.deltaTime * PlayerRotationSpeed;
-            this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * -Vector3.right);
-        }
-
-        if (totalZRotation > 5.0f)
-        {
-            totalZRotation -= Time.deltaTime * PlayerRotationSpeed;
-            this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * -Vector3.forward);
-        }
-        else if (totalZRotation < -5.0f)
-        {
-            totalZRotation += Time.deltaTime * PlayerRotationSpeed;
-            this.transform.Rotate(Time.deltaTime * PlayerRotationSpeed * Vector3.forward);
-        }
-
-        if (Mathf.Abs(totalZRotation) <= 5.0f && Mathf.Abs(totalXRotation) <= 5.0f)
-        {
-            this.transform.rotation = Quaternion.AngleAxis(0, Vector3.right + Vector3.forward);
+            this.transform.rotation = Quaternion.identity;
             totalXRotation = 0.0f;
             totalZRotation = 0.0f;
         }
-
+        
         if (Jumping)
         {
             //Debug.Log("velocityX0: " + velocityX0 + "velocityZ0: " + velocityZ0);
@@ -171,13 +151,13 @@ public class PlayerMovementController : MonoBehaviour {
                                 if (swipeValue > 0)
                                 {
                                     Move(MoveDir.Right);
-                                    totalZRotation += 90.0f;
+                                    totalZRotation -= 90.0f;
                                     //Debug.Log("Right Swipe");
                                 }
                                 else if (swipeValue < 0)
                                 {
                                     Move(MoveDir.Left);
-                                    totalZRotation -= 90.0f;
+                                    totalZRotation += 90.0f;
                                     //Debug.Log("left Swipe");
                                 }
                             }
