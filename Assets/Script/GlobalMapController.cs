@@ -88,16 +88,13 @@ public class GlobalMapController : MonoBehaviour {
         int xCoord = Mathf.RoundToInt(player.transform.position.x / (mapX * cubeWidth));
         int yCoord = Mathf.RoundToInt(player.transform.position.z / (mapY * cubeWidth));
 
-        //Debug.Log("xCoord: " + xCoord + " yCoord: " + yCoord + " oldXCoord: " + oldXCoord + " yCoord: " + yCoord);
-        //Player Chunk has changed
+        //Do this if player chunk coordinates have changed
         if (xCoord != oldXCoord || xCoord != oldXCoord || yCoord != oldYCoord || yCoord != oldYCoord)
         {
             foreach (ChunkData chunk in myChunks)
             {
                 chunk.myChunk.SetActive(false);
             }
-            //Debug.Log("xCoord : " + xCoord + " yCoord : " + yCoord);
-            //Debug.Log((xCoord - depthOfView) + " <= x <= " + (xCoord + depthOfView) + "  ----  " + (yCoord - depthOfView) + " <= y <= " + (yCoord + depthOfView));
             for (int X = xCoord - depthOfView; X <= xCoord + depthOfView; X++)
             {
                 for (int Y = yCoord - depthOfView; Y <= yCoord + depthOfView; Y++)
