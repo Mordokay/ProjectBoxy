@@ -27,6 +27,8 @@ public class PlayerMovementController : MonoBehaviour {
 
     public float PlayerRotationSpeed = 10.0f;
 
+    public GameObject GlobalMap;
+
     public float startJumpTime;
     public Vector3 startPos;
     public Vector3 endPos;
@@ -40,15 +42,6 @@ public class PlayerMovementController : MonoBehaviour {
         Back,
         Left,
         Right
-    }
-
-    void Start()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(Vector3.zero + new Vector3(0.0f, 10.0f, 0.0f), Vector3.down, out hit, Mathf.Infinity, boxLayer))
-        {
-            this.transform.position = new Vector3(0.0f, hit.collider.gameObject.transform.position.y + cubeHeight, 0.0f);
-        }
     }
 
     void Update()
@@ -82,7 +75,7 @@ public class PlayerMovementController : MonoBehaviour {
             }
             else if ((this.transform.position - endPos).magnitude < 1.0f)
             {
-                this.transform.position = Vector3.Lerp(this.transform.position, endPos, Time.deltaTime * 100.0f);
+                this.transform.position = Vector3.Lerp(this.transform.position, endPos, Time.deltaTime * 50.0f);
             }
 
             if ((this.transform.position - endPos).magnitude < 0.001f)
@@ -95,6 +88,8 @@ public class PlayerMovementController : MonoBehaviour {
                 velocityX0 = 0.0f;
                 velocityY0 = 0.0f;
                 velocityZ0 = 0.0f;
+
+                GlobalMap.GetComponent<GlobalMapController>().UpdateMap();
             }
         }
         if (Input.touchCount > 0 && !lockSwipe)

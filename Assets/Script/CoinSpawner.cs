@@ -5,7 +5,7 @@ public class CoinSpawner : MonoBehaviour {
 
     public GameObject Coin;
 
-    public void InstanciateCoins(int[,] mapHeight, float increment, float startX, float startY)
+    public void InstanciateCoins(int[,] mapHeight, float increment, float startX, float startY, float mapX, float mapY)
     {
         for (int i = 0; i < mapHeight.GetLength(0); i++)
         {
@@ -13,7 +13,7 @@ public class CoinSpawner : MonoBehaviour {
             {
                 if (mapHeight[i, j] == 1 && Random.Range(0.0f, 10.0f) < 3.0f)
                 {
-                    Instantiate(Coin, new Vector3(startX + i * increment, mapHeight[i, j] + 1.0f, startY + j * increment),
+                    Instantiate(Coin, new Vector3(startX + i * increment - (mapX / 2.0f) * increment, mapHeight[i, j] + 1.0f, startY + j * increment - (mapY / 2.0f) * increment),
                         Quaternion.Euler(new Vector3(Random.Range(-180f, 180f), Random.Range(-180f, 180f), Random.Range(-180f, 180f))),transform);
                 }
             }

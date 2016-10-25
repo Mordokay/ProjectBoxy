@@ -3,9 +3,8 @@ using System.Collections;
 
 public class MapTerrainGenerator : MonoBehaviour {
 
-    public int sizeX = 20;
-    public int sizeY = 20;
-    public GameObject myCube;
+    public int sizeX;
+    public int sizeY;
     public GameObject cubeLimit;
     public TerrainType[] terrain;
     public float cubeScale = 4.0f;
@@ -96,9 +95,8 @@ public class MapTerrainGenerator : MonoBehaviour {
                             break;
                         }
                     }
-                    GameObject cubeAux = Instantiate(myCube) as GameObject;
-                    cubeAux.transform.position = new Vector3(x * cubeScale, (int)(mapHeight[x, y]), y * cubeScale);
-                    cubeAux.GetComponent<Renderer>().material = terrain[chosenMaterial].material;
+                    GameObject cubeAux = Instantiate(terrain[chosenMaterial].CubeType) as GameObject;
+                    cubeAux.transform.position = new Vector3((x - (sizeX / 2.0f)) * cubeScale, (int)(mapHeight[x, y]), (y - (sizeY / 2.0f)) * cubeScale);
                     cubeAux.transform.parent = this.transform;
                 }
             }
@@ -110,6 +108,6 @@ public class MapTerrainGenerator : MonoBehaviour {
     {
         public string name;
         public int height;
-        public Material material;
+        public GameObject CubeType;
     }
 }
