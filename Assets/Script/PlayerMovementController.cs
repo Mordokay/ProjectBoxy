@@ -9,7 +9,6 @@ public class PlayerMovementController : MonoBehaviour {
     float minSwipeDistX = 0.1f;
     public float movementShift = 4.0f;
     public LayerMask boxLayer;
-    public float cubeHeight = 1.0f;
 
     public bool diagonalMovement = false;
 
@@ -73,12 +72,11 @@ public class PlayerMovementController : MonoBehaviour {
                     this.transform.position = getJumpPosHorizontal();
                 }
             }
-            else if ((this.transform.position - endPos).magnitude < 1.0f)
+            else if ((this.transform.position - endPos).magnitude > 0.005f)
             {
-                this.transform.position = Vector3.Lerp(this.transform.position, endPos, Time.deltaTime * 50.0f);
+                this.transform.position = Vector3.Lerp(this.transform.position, endPos, Time.deltaTime * (200.0f / jumpHeight));
             }
-
-            if ((this.transform.position - endPos).magnitude < 0.001f)
+            else
             {
                 Jumping = false;
                 doubleJumping = false;
@@ -261,11 +259,11 @@ public class PlayerMovementController : MonoBehaviour {
         {
             //The value 100 means that the cube can jump 100.0f down!!!
             case MoveDir.Front:
-                
                 endPos += Vector3.forward * movementShift;
-                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * cubeHeight * 0.9f, Vector3.down, out hit, cubeHeight * 100.0f, boxLayer))
+                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
                 {
-                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + cubeHeight, endPos.z);
+                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + ((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y / 50.0f) / 2.0f), endPos.z);
+                    Debug.Log(((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y) / 2.0f));
                 }
                 
                 break;
@@ -273,27 +271,27 @@ public class PlayerMovementController : MonoBehaviour {
             case MoveDir.Back:
 
                 endPos -= Vector3.forward * movementShift;
-                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, cubeHeight * 100.0f, boxLayer))
+                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
                 {
-                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + cubeHeight, endPos.z);
+                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + ((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y / 50.0f) / 2.0f), endPos.z);
                 }
                 break;
 
             case MoveDir.Left:
 
                 endPos -= Vector3.right * movementShift;
-                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, cubeHeight * 100.0f, boxLayer))
+                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
                 {
-                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + cubeHeight, endPos.z);
+                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + ((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y / 50.0f) / 2.0f), endPos.z);
                 }
                 break;
 
             case MoveDir.Right:
 
                 endPos += Vector3.right * movementShift;
-                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, cubeHeight * 100.0f, boxLayer))
+                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
                 {
-                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + cubeHeight, endPos.z);
+                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + ((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y / 50.0f) / 2.0f), endPos.z);
                 }
                 break;
         }

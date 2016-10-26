@@ -9,7 +9,6 @@ public class GlobalMapController : MonoBehaviour {
     public int seed = 12345;
 
     float cubeWidth = 4.0f;
-    float cubeHeight = 1.0f;
     public GameObject mapChunk;
     public GameObject coinManager;
 
@@ -28,8 +27,11 @@ public class GlobalMapController : MonoBehaviour {
 
     void Start () {
 
+        //adds a seed to Random to make world exactly the same when using the same seed
+        Random.InitState(seed);
+
         //Maps must always be even number
-        if((mapX % 2) != 0)
+        if ((mapX % 2) != 0)
         {
             mapX += 1;
         }
@@ -54,7 +56,7 @@ public class GlobalMapController : MonoBehaviour {
         if (Physics.Raycast(raycastPos, Vector3.down, out hit, Mathf.Infinity))
         {
            GameObject.FindGameObjectWithTag("Player").transform.position = new Vector3(raycastPos.x,
-               hit.collider.gameObject.transform.position.y + cubeHeight, raycastPos.z);
+               hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.localScale.y, raycastPos.z);
         }
 
         UpdateMap();
@@ -77,7 +79,7 @@ public class GlobalMapController : MonoBehaviour {
         GameObject myCoinManager = Instantiate(coinManager) as GameObject;
         myCoinManager.transform.position = new Vector3(i * mapX * cubeWidth, 0.0f, j * mapY * cubeWidth);
         myCoinManager.transform.parent = myChunk.transform;
-        myCoinManager.GetComponent<CoinSpawner>().InstanciateCoins(myChunk.GetComponent<MapTerrainGenerator>().mapHeight, cubeWidth, i * mapX * cubeWidth, j * mapY * cubeWidth, mapX, mapY);
+        myCoinManager.GetComponent<CoinSpawner>().InstanciateCoins(myChunk.GetComponent<MapTerrainGenerator>().mapHeight, cubeWidth, i * mapX * cubeWidth, j * mapY * cubeWidth, mapX, mapY, seed);
 
         myChunks.Add(new ChunkData(myChunk, i, j, true));
 
@@ -112,7 +114,7 @@ public class GlobalMapController : MonoBehaviour {
                     if (!chunkFound)
                     {
                         InstanciateChunk(X, Y).SetActive(true);
-                        Debug.Log("Instanciated a Chunk at position: ( " + X + " , " + Y + " )");
+                        //Debug.Log("Instanciated a Chunk at position: ( " + X + " , " + Y + " )");
                     }
                 }
             }
