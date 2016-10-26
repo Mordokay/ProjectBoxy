@@ -2,7 +2,8 @@
 using System.Collections;
 using System;
 
-public class PlayerMovementController : MonoBehaviour {
+public class PlayerMovementController : MonoBehaviour
+{
 
     //Swipe percentage based on screen width and height
     float minSwipeDistY = 0.1f;
@@ -58,7 +59,8 @@ public class PlayerMovementController : MonoBehaviour {
         if (Jumping)
         {
             //Lerping prevent "falling off the map " when sometimes stop condition fails
-            if ((this.transform.position - endPos).magnitude > 1.0f){
+            if ((this.transform.position - endPos).magnitude > 1.0f)
+            {
                 if (velocityX0 != 0 && velocityZ0 != 0 && jumpCalculated)
                 {
                     this.transform.position = getJumpPos();
@@ -181,7 +183,7 @@ public class PlayerMovementController : MonoBehaviour {
             }
         }
 
-        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) &&  !lockSwipe)
+        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && !lockSwipe)
         {
             Move(MoveDir.Left);
             totalZRotation += 90.0f;
@@ -260,41 +262,35 @@ public class PlayerMovementController : MonoBehaviour {
             //The value 100 means that the cube can jump 100.0f down!!!
             case MoveDir.Front:
                 endPos += Vector3.forward * movementShift;
-                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
-                {
-                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + ((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y / 50.0f) / 2.0f), endPos.z);
-                    Debug.Log(((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y) / 2.0f));
-                }
                 
+
                 break;
 
             case MoveDir.Back:
 
                 endPos -= Vector3.forward * movementShift;
-                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
-                {
-                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + ((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y / 50.0f) / 2.0f), endPos.z);
-                }
+                
                 break;
 
             case MoveDir.Left:
 
                 endPos -= Vector3.right * movementShift;
-                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
-                {
-                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + ((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y / 50.0f) / 2.0f), endPos.z);
-                }
+                
                 break;
 
             case MoveDir.Right:
 
                 endPos += Vector3.right * movementShift;
-                if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
-                {
-                    endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + ((hit.collider.gameObject.transform.localScale.y + this.transform.localScale.y / 50.0f) / 2.0f), endPos.z);
-                }
+                
                 break;
         }
+
+        if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
+        {
+            endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.parent.localScale.y, endPos.z);
+            //Debug.Log("parent scale: " + hit.collider.gameObject.transform.parent.localScale.y);
+        }
+
         if (doubleJumping)
         {
             lockSwipe = true;
@@ -314,14 +310,14 @@ public class PlayerMovementController : MonoBehaviour {
 
         velocityX0 = (endPos.x - startPos.x) / jumpDurationTime;
         velocityZ0 = (endPos.z - startPos.z) / jumpDurationTime;
-        
+
         jumpCalculated = true;
     }
 
     Vector3 getJumpPosHorizontal()
     {
         float x = startPos.x + velocityX0 * (Time.time - startJumpTime);
-        float y = startPos.y + velocityY0 * (Time.time - startJumpTime) + (1.0f/2.0f) * jumpGravity * (Time.time - startJumpTime) * (Time.time - startJumpTime);
+        float y = startPos.y + velocityY0 * (Time.time - startJumpTime) + (1.0f / 2.0f) * jumpGravity * (Time.time - startJumpTime) * (Time.time - startJumpTime);
 
         return new Vector3(x, y, startPos.z);
     }

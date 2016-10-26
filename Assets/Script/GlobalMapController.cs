@@ -25,6 +25,22 @@ public class GlobalMapController : MonoBehaviour {
     public Vector2 playerStartPos;
     GameObject player;
 
+    public float treeThreeshold;
+
+    void Reset()
+    {
+        treeThreeshold = 0.1f;
+        oldXCoord = -999;
+        oldYCoord = -999;
+        mapX = 8;
+        mapY = 8;
+        seed = 12345;
+        ChunksX = 1;
+        ChunksY = 1;
+        cubeWidth = 4.0f;
+        depthOfView = 2;
+    }
+
     void Start () {
 
         //adds a seed to Random to make world exactly the same when using the same seed
@@ -79,7 +95,8 @@ public class GlobalMapController : MonoBehaviour {
         GameObject myCoinManager = Instantiate(coinManager) as GameObject;
         myCoinManager.transform.position = new Vector3(i * mapX * cubeWidth, 0.0f, j * mapY * cubeWidth);
         myCoinManager.transform.parent = myChunk.transform;
-        myCoinManager.GetComponent<CoinSpawner>().InstanciateCoins(myChunk.GetComponent<MapTerrainGenerator>().mapHeight, cubeWidth, i * mapX * cubeWidth, j * mapY * cubeWidth, mapX, mapY, seed);
+        myCoinManager.GetComponent<CoinSpawner>().InstanciateCoins(myChunk.GetComponent<MapTerrainGenerator>().mapHeight,
+            myChunk.GetComponent<MapTerrainGenerator>().getTreePositions(treeThreeshold), cubeWidth, i * mapX * cubeWidth, j * mapY * cubeWidth, mapX, mapY, seed);
 
         myChunks.Add(new ChunkData(myChunk, i, j, true));
 

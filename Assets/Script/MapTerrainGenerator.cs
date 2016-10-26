@@ -19,6 +19,7 @@ public class MapTerrainGenerator : MonoBehaviour {
     public float persistence;
     public float lacunarity;
     public int[ , ] mapHeight;
+    public int[,] treeNoise;
 
     public bool autoUpdate;
     public bool makeColliders = false;
@@ -59,6 +60,24 @@ public class MapTerrainGenerator : MonoBehaviour {
         {
             removeMap();
         }
+    }
+
+    public int[,] getTreePositions(float threeshold)
+    {
+        float[,] treeNoiseMap = Noise.GeneratedNoiseMap(sizeX, sizeY, seed * seed, noiseScale, octaves, persistence, lacunarity, mapCenter + offset, normalizedMode);
+        treeNoise = new int[sizeX, sizeY];
+
+        for (int x = 0; x < sizeX; x++)
+        {
+            for (int y = 0; y < sizeY; y++)
+            {
+                if(treeNoiseMap[x, y] < threeshold)
+                {
+                    treeNoise[x, y] = 1;
+                }
+            }
+        }
+        return treeNoise;
     }
 
     public void instanciateCubes() {
