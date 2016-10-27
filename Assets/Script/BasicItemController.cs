@@ -7,7 +7,6 @@ public class BasicItemController : MonoBehaviour {
     {
         if (coll.gameObject.tag.Equals("ItemCube"))
         {
-            //Debug.Log("Destroyed : " + coll.gameObject.name);
             Destroy(coll.gameObject);
         }
     }

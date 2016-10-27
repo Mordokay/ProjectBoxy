@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class PlayerMovementController : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class PlayerMovementController : MonoBehaviour
     float minSwipeDistX = 0.1f;
     public float movementShift = 4.0f;
     public LayerMask boxLayer;
+    public LayerMask touchLayer;
 
     public bool diagonalMovement = false;
 
@@ -29,6 +31,8 @@ public class PlayerMovementController : MonoBehaviour
 
     public GameObject GlobalMap;
 
+    List<GameObject> adjacentGrid;
+
     public float startJumpTime;
     public Vector3 startPos;
     public Vector3 endPos;
@@ -42,6 +46,13 @@ public class PlayerMovementController : MonoBehaviour
         Back,
         Left,
         Right
+    }
+
+    Vector3 adjacentPos;
+
+    void Start()
+    {
+        adjacentGrid = new List<GameObject>();
     }
 
     void Update()
@@ -58,7 +69,7 @@ public class PlayerMovementController : MonoBehaviour
 
         if (Jumping)
         {
-            //Lerping prevent "falling off the map " when sometimes stop condition fails
+            //Lerping prevents "falling off the map bug" when sometimes stop condition fails
             if ((this.transform.position - endPos).magnitude > 1.0f)
             {
                 if (velocityX0 != 0 && velocityZ0 != 0 && jumpCalculated)
@@ -90,6 +101,8 @@ public class PlayerMovementController : MonoBehaviour
                 velocityZ0 = 0.0f;
 
                 GlobalMap.GetComponent<GlobalMapController>().UpdateMap();
+
+                EnableAdjacentGrid();
             }
         }
         if (Input.touchCount > 0 && !lockSwipe)
@@ -206,11 +219,80 @@ public class PlayerMovementController : MonoBehaviour
         }
     }
 
+    public void EnableAdjacentGrid(){
+
+        //Debug.Log("adjacentGrid count: " + adjacentGrid.Count);
+        foreach (GameObject grid in adjacentGrid)
+        {
+            grid.SetActive(false);
+        }
+        adjacentGrid.Clear();
+
+        RaycastHit hit;
+
+        adjacentPos = this.transform.position + Vector3.forward * movementShift;
+        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
+        {
+            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
+            {
+                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
+                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
+                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
+            }
+        }
+
+        adjacentPos = this.transform.position - Vector3.forward * movementShift;
+        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
+        {
+            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
+            {
+                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
+                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
+                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
+            }
+        }
+
+        adjacentPos = this.transform.position - Vector3.right * movementShift;
+        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
+        {
+            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
+            {
+                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
+                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
+                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
+            }
+        }
+
+        adjacentPos = this.transform.position + Vector3.right * movementShift;
+        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
+        {
+            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
+            {
+                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
+                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
+                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
+            }
+        }
+
+        adjacentPos = this.transform.position;
+        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
+        {
+            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
+            {
+                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
+                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
+                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
+            }
+        }
+        Debug.Log("adjacentGrid count: " + adjacentGrid.Count);
+    }
+
     private void Move(MoveDir moveType)
     {
         bool mapLimitDetected = false;
         RaycastHit hit;
 
+        /*
         //Map Limit Detection
         switch (moveType)
         {
@@ -243,7 +325,7 @@ public class PlayerMovementController : MonoBehaviour
                 }
                 break;
         }
-
+        */
         if (!Jumping)
         {
             Jumping = true;
@@ -262,33 +344,32 @@ public class PlayerMovementController : MonoBehaviour
             //The value 100 means that the cube can jump 100.0f down!!!
             case MoveDir.Front:
                 endPos += Vector3.forward * movementShift;
-                
-
                 break;
 
             case MoveDir.Back:
-
                 endPos -= Vector3.forward * movementShift;
-                
                 break;
 
             case MoveDir.Left:
-
                 endPos -= Vector3.right * movementShift;
-                
                 break;
 
             case MoveDir.Right:
-
                 endPos += Vector3.right * movementShift;
-                
                 break;
         }
-
         if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
         {
-            endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.parent.localScale.y, endPos.z);
-            //Debug.Log("parent scale: " + hit.collider.gameObject.transform.parent.localScale.y);
+            Debug.Log(hit.collider.gameObject.name);
+            if(hit.collider.tag == "PlacementBox")
+            {
+                endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.localScale.y, endPos.z);
+            }
+            else
+            {
+                endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.parent.localScale.y, endPos.z);
+            }
+            
         }
 
         if (doubleJumping)

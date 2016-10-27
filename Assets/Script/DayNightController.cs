@@ -189,16 +189,6 @@ public class DayNightController : MonoBehaviour
         dawnDuskFog = new Color(133.0f / 255.0f, 124.0f / 255.0f, 102.0f / 255.0f);
         dayFog = new Color(180.0f / 255.0f, 208.0f / 255.0f, 209.0f / 255.0f);
         nightFog = new Color(12.0f / 255.0f, 15.0f / 255.0f, 91.0f / 255.0f);
-        Skybox[] skyboxes = AssetBundle.FindObjectsOfTypeIncludingAssets(typeof(Skybox)) as Skybox[];
-        foreach (Skybox box in skyboxes)
-        {
-            if (box.name == "DawnDusk Skybox")
-            { dawnDuskSkybox = box.material; }
-            else if (box.name == "StarryNight Skybox")
-            { nightSkybox = box.material; }
-            else if (box.name == "Sunny2 Skybox")
-            { daySkybox = box.material; }
-        }
     }
 
     // Use this for initialization

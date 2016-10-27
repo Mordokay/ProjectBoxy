@@ -14,13 +14,8 @@ public class visibilityColiderDetector : MonoBehaviour {
             {
                 Color myColor = myObject.GetComponent<Renderer>().material.color;
                 myColor.a = 0.0f;
-                //Debug.Log(myObject.name + "  Color: " + myColor);
                 myObject.GetComponent<Renderer>().material.color = myColor;
-                
             }
-            //Debug.Log("GameObject entered VisionController: " + coll.gameObject.name + " at position:   " + this.transform.position);
-            //Debug.Log("Destroyed : " + coll.gameObject.name);
-            //Destroy(coll.gameObject);
         }
     }
 
@@ -35,9 +30,6 @@ public class visibilityColiderDetector : MonoBehaviour {
                 myColor.a = 1.0f;
                 myObject.GetComponent<Renderer>().material.color = myColor;
             }
-            //Debug.Log("GameObject exited VisionController: " + coll.gameObject.name + " at position:   " + coll.gameObject.transform.position);
-            //Debug.Log("Destroyed : " + coll.gameObject.name);
-            //Destroy(coll.gameObject);
         }
     }
 }

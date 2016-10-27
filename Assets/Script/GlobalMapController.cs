@@ -26,6 +26,7 @@ public class GlobalMapController : MonoBehaviour {
     GameObject player;
 
     public float treeThreeshold;
+    public LayerMask boxLayer;
 
     void Reset()
     {
@@ -67,13 +68,16 @@ public class GlobalMapController : MonoBehaviour {
             }
         }
 
+
+        //Sets initial player position
         RaycastHit hit;
         Vector3 raycastPos = new Vector3(playerStartPos.x * cubeWidth, 10.0f, playerStartPos.y * cubeWidth);
-        if (Physics.Raycast(raycastPos, Vector3.down, out hit, Mathf.Infinity))
+        if (Physics.Raycast(raycastPos, Vector3.down, out hit, Mathf.Infinity, boxLayer))
         {
            GameObject.FindGameObjectWithTag("Player").transform.position = new Vector3(raycastPos.x,
                hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.localScale.y, raycastPos.z);
         }
+        player.GetComponent<PlayerMovementController>().EnableAdjacentGrid();
 
         UpdateMap();
     }
