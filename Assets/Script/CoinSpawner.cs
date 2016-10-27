@@ -29,7 +29,9 @@ public class CoinSpawner : MonoBehaviour {
                         Quaternion.identity, transform) as GameObject;
                     float randomScale = Random.Range(treeMinSize, treeMaxSize);
                     myTree.transform.localScale = new Vector3(randomScale, randomScale, randomScale);
-                    myTree.transform.RotateAround(myTree.transform.position, Vector3.up, Random.value * 360.0f);
+
+                    //Shader is transparent so if rotation is applied the trunk of the tree can 
+                    //myTree.transform.RotateAround(myTree.transform.position, Vector3.up, Random.value * 360.0f);
                 }
             }
         }
