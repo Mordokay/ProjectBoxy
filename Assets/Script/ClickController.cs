@@ -9,6 +9,7 @@ public class ClickController : MonoBehaviour {
 
     public LayerMask touchLayer;
     public LayerMask gridTouchLayer;
+    public LayerMask boxLayer;
 
     public GameObject placementCube;
 
@@ -46,22 +47,47 @@ public class ClickController : MonoBehaviour {
                         {
                             Debug.Log("Chop some Wood baby!!!");
                             Destroy(hit.collider.gameObject.transform.parent.gameObject);
+                            player.GetComponent<PlayerMovementController>().UpdateAdjacentGrid();
                         }
                     }
                 }
                 if (Physics.Raycast(ray, out hit, 20.0f, gridTouchLayer))
                 {
                     GameObject myCube = Instantiate(placementCube) as GameObject;
-                    myCube.transform.position = new Vector3 (hit.collider.gameObject.transform.position.x, hit.collider.gameObject.transform.position.y + myCube.transform.localScale.y / 2.0f , hit.collider.gameObject.transform.position.z); 
-                    Debug.Log("Instranciated cube: " + myCube.name + " at position: " + myCube.transform.position);
+                    myCube.transform.position = hit.collider.gameObject.transform.position + (hit.collider.gameObject.transform.up / 2.0f) * 1.3333f;
+                    player.GetComponent<PlayerMovementController>().UpdateAdjacentGrid();
+                    //Debug.Log("Instanciated cube: " + myCube.name + " at position: " + myCube.transform.position);
+                    //Debug.Log("Up vector: "+ hit.collider.gameObject.transform.up);
+                }
+
+            }
+        }
+
+        //RightClick to destroy cubes!!!
+        if (Input.GetMouseButtonDown(1))
+        {
+            startTouchPos = Input.mousePosition;
+        }
+        else if (Input.GetMouseButtonUp(1))
+        {
+            endTouchPos = Input.mousePosition;
+            Vector2 drag = new Vector2(endTouchPos.x / Screen.width, endTouchPos.y / Screen.height) - new Vector2(startTouchPos.x / Screen.width, startTouchPos.y / Screen.height);
+
+            if (drag.magnitude < 0.05f)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit, 20.0f, boxLayer) && hit.collider.tag.Equals("PlacementBox"))
+                {
+                    Debug.Log("Destroyed : " + hit.collider + " at Position: " + hit.collider.gameObject.transform.position);
+                    DestroyImmediate(hit.collider.gameObject);
+                    player.GetComponent<PlayerMovementController>().UpdateAdjacentGrid();
+                    player.GetComponent<PlayerMovementController>().CheckPlayerFall();
                 }
             }
         }
-            
         /*
-        if (Input.GetMouseButtonDown(1))
-            Debug.Log("Pressed right click.");
-
         if (Input.GetMouseButtonDown(2))
             Debug.Log("Pressed middle click.");
             */

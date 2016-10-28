@@ -13,6 +13,13 @@ public class PlayerMovementController : MonoBehaviour
     public LayerMask boxLayer;
     public LayerMask touchLayer;
 
+    public float placementRadius;
+    public GameObject placementGreen;
+    public GameObject placementRed;
+    public GameObject placementGrid;
+    List<GameObject> adjacentGrid;
+    GameObject myPlacement;
+
     public bool diagonalMovement = false;
 
     private Vector2 startTouchPos;
@@ -29,9 +36,7 @@ public class PlayerMovementController : MonoBehaviour
 
     public float PlayerRotationSpeed = 10.0f;
 
-    public GameObject GlobalMap;
-
-    List<GameObject> adjacentGrid;
+    public GameObject GlobalMap;    
 
     public float startJumpTime;
     public Vector3 startPos;
@@ -47,8 +52,6 @@ public class PlayerMovementController : MonoBehaviour
         Left,
         Right
     }
-
-    Vector3 adjacentPos;
 
     void Start()
     {
@@ -80,9 +83,13 @@ public class PlayerMovementController : MonoBehaviour
                 {
                     this.transform.position = getJumpPosForward();
                 }
-                else
+                else if((velocityX0 != 0 && jumpCalculated))
                 {
                     this.transform.position = getJumpPosHorizontal();
+                }
+                else if(jumpCalculated)
+                {
+                    this.transform.position = getJumpPos();
                 }
             }
             else if ((this.transform.position - endPos).magnitude > 0.005f)
@@ -102,7 +109,7 @@ public class PlayerMovementController : MonoBehaviour
 
                 GlobalMap.GetComponent<GlobalMapController>().UpdateMap();
 
-                EnableAdjacentGrid();
+                UpdateAdjacentGrid();
             }
         }
         if (Input.touchCount > 0 && !lockSwipe)
@@ -199,92 +206,69 @@ public class PlayerMovementController : MonoBehaviour
         if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && !lockSwipe)
         {
             Move(MoveDir.Left);
-            totalZRotation += 90.0f;
+            //totalZRotation += 90.0f;
         }
         else if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && !lockSwipe)
         {
             Move(MoveDir.Right);
-            totalZRotation -= 90.0f;
+            //totalZRotation -= 90.0f;
         }
         else if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && !lockSwipe)
         {
             Move(MoveDir.Front);
-            totalXRotation += 90;
+            //totalXRotation += 90;
         }
 
         else if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && !lockSwipe)
         {
             Move(MoveDir.Back);
-            totalXRotation -= 90;
+            //totalXRotation -= 90;
         }
     }
 
-    public void EnableAdjacentGrid(){
+    public void CheckPlayerFall()
+    {
+        if (Physics.OverlapBox(transform.position, Vector3.one * 0.51f, Quaternion.identity, boxLayer).Length == 1){
+            RaycastHit hit;
+            if (Physics.Raycast(this.transform.position + Vector3.down, Vector3.down, out hit, Mathf.Infinity, boxLayer))
+            {
+                startPos = this.transform.position;
+                endPos = hit.point + Vector3.up * 0.5f;
 
-        //Debug.Log("adjacentGrid count: " + adjacentGrid.Count);
-        foreach (GameObject grid in adjacentGrid)
+                CalculateLerp();
+                Jumping = true;
+            }
+        }
+    }
+
+    public void UpdateAdjacentGrid(){
+
+        for (int i = adjacentGrid.Count - 1; i >= 0; i--)
         {
-            grid.SetActive(false);
+            Destroy(adjacentGrid[i].gameObject);
         }
         adjacentGrid.Clear();
 
+        placementGrid.transform.position = this.transform.position;
         RaycastHit hit;
 
-        adjacentPos = this.transform.position + Vector3.forward * movementShift;
-        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
+        //Ground placement
+        for (float i = -5.33333f; i < 5.33333f; i += 1.33333f)
         {
-            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
+            for (float j = -5.33333f; j <= 5.33333f; j += 1.33333f)
             {
-                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
-                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
-                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
+                if (Mathf.Abs(i) + Mathf.Abs(j) < placementRadius && Physics.Raycast(this.transform.position + new Vector3(i, 100.0f, j), Vector3.down, out hit, Mathf.Infinity, boxLayer))
+                {
+                    if (hit.collider.tag.Equals("GroundBox"))
+                    {
+                        myPlacement = Instantiate(placementGreen) as GameObject;
+                        myPlacement.transform.parent = placementGrid.transform;
+                        myPlacement.transform.position = hit.point;
+                        adjacentGrid.Add(myPlacement);
+                    }
+                }
             }
         }
-
-        adjacentPos = this.transform.position - Vector3.forward * movementShift;
-        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
-        {
-            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
-            {
-                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
-                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
-                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
-            }
-        }
-
-        adjacentPos = this.transform.position - Vector3.right * movementShift;
-        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
-        {
-            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
-            {
-                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
-                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
-                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
-            }
-        }
-
-        adjacentPos = this.transform.position + Vector3.right * movementShift;
-        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
-        {
-            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
-            {
-                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
-                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
-                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
-            }
-        }
-
-        adjacentPos = this.transform.position;
-        if (Physics.Raycast(adjacentPos + Vector3.up * 100.0f, Vector3.down, out hit, Mathf.Infinity, touchLayer))
-        {
-            if (hit.collider.tag.Equals("Grid") && Mathf.Abs(hit.collider.transform.position.y + 0.5f - this.transform.position.y) <= 1.0f)
-            {
-                //Debug.Log("Hit at Pos: " + hit.collider.transform.GetChild(0).name);
-                hit.collider.transform.GetChild(0).gameObject.SetActive(true);
-                adjacentGrid.Add(hit.collider.transform.GetChild(0).gameObject);
-            }
-        }
-        Debug.Log("adjacentGrid count: " + adjacentGrid.Count);
     }
 
     private void Move(MoveDir moveType)
@@ -338,6 +322,7 @@ public class PlayerMovementController : MonoBehaviour
             lockSwipe = true;
             startPos = this.transform.position;
         }
+        Vector3 oldEndPos = endPos;
 
         switch (moveType)
         {
@@ -360,16 +345,43 @@ public class PlayerMovementController : MonoBehaviour
         }
         if (Physics.Raycast(new Vector3(endPos.x, this.transform.position.y, endPos.z) + Vector3.up * jumpHeight * 0.9f, Vector3.down, out hit, 100.0f, boxLayer))
         {
-            Debug.Log(hit.collider.gameObject.name);
-            if(hit.collider.tag == "PlacementBox")
+            endPos = new Vector3(endPos.x, hit.point.y + 0.5f, endPos.z);
+            /*
+            if (hit.collider.tag == "PlacementBox")
             {
-                endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.localScale.y, endPos.z);
+                endPos = new Vector3(endPos.x, hit.point.y + 0.5f, endPos.z);
             }
             else
             {
                 endPos = new Vector3(endPos.x, hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.parent.localScale.y, endPos.z);
             }
-            
+            */
+        }
+
+        //Prevents lpayer from trying to jump to a place he cant reach
+        if (endPos.y - transform.position.y > jumpHeight * 0.9f) {
+            endPos = oldEndPos;
+        }
+        else {
+            switch (moveType)
+            {
+                case MoveDir.Front:
+                    totalXRotation += 90;
+                    break;
+
+                case MoveDir.Back:
+                    totalXRotation -= 90;
+                    break;
+
+                case MoveDir.Left:
+                    totalZRotation += 90.0f;
+                    break;
+
+                case MoveDir.Right:
+                    totalZRotation -= 90.0f;
+                    break;
+            }
+
         }
 
         if (doubleJumping)
@@ -387,6 +399,18 @@ public class PlayerMovementController : MonoBehaviour
     {
         startJumpTime = Time.time;
         velocityY0 = Mathf.Sqrt(2.0f * jumpGravity * (-jumpHeight));
+        jumpDurationTime = (-velocityY0 - Mathf.Sqrt(velocityY0 * velocityY0 - 2.0f * jumpGravity * (startPos.y - endPos.y))) / jumpGravity;
+
+        velocityX0 = (endPos.x - startPos.x) / jumpDurationTime;
+        velocityZ0 = (endPos.z - startPos.z) / jumpDurationTime;
+
+        jumpCalculated = true;
+    }
+
+    void CalculateLerp()
+    {
+        startJumpTime = Time.time;
+        velocityY0 = 0.0f;
         jumpDurationTime = (-velocityY0 - Mathf.Sqrt(velocityY0 * velocityY0 - 2.0f * jumpGravity * (startPos.y - endPos.y))) / jumpGravity;
 
         velocityX0 = (endPos.x - startPos.x) / jumpDurationTime;

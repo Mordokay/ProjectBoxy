@@ -77,7 +77,7 @@ public class GlobalMapController : MonoBehaviour {
            GameObject.FindGameObjectWithTag("Player").transform.position = new Vector3(raycastPos.x,
                hit.collider.gameObject.transform.position.y + hit.collider.gameObject.transform.localScale.y, raycastPos.z);
         }
-        player.GetComponent<PlayerMovementController>().EnableAdjacentGrid();
+        player.GetComponent<PlayerMovementController>().UpdateAdjacentGrid();
 
         UpdateMap();
     }
