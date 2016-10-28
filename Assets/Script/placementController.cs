@@ -13,8 +13,10 @@ public class placementController : MonoBehaviour
         if (Physics.OverlapBox(transform.position, Vector3.one * 0.1f, Quaternion.identity, selectedLayers).Length > 1)
         {
             this.GetComponent<MeshRenderer>().enabled = false;
+            this.GetComponent<BoxCollider>().enabled = false;
         }
         else {
+            this.GetComponent<BoxCollider>().enabled = true;
             this.GetComponent<MeshRenderer>().enabled = true;
         }
     }
@@ -23,9 +25,11 @@ public class placementController : MonoBehaviour
         if (Physics.OverlapBox(transform.position, Vector3.one * 0.1f, Quaternion.identity, selectedLayers).Length > 1)
         {
             this.GetComponent<MeshRenderer>().enabled = false;
+            this.GetComponent<BoxCollider>().enabled = false;
         }
         else
         {
+            this.GetComponent<BoxCollider>().enabled = true;
             this.GetComponent<MeshRenderer>().enabled = true;
         }
     }
